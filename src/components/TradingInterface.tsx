@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Plus, Minus, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface TradingInterfaceProps {
@@ -47,6 +47,19 @@ export const TradingInterface = ({ selectedCrypto }: TradingInterfaceProps) => {
     setAmount('');
   };
 
+  const handleQuickTrade = (type: 'buy' | 'sell', quickAmount: string) => {
+    setOrderType(type);
+    setAmount(quickAmount);
+    setOrderMode('market');
+    
+    setTimeout(() => {
+      toast({
+        title: "Quick Trade Executed",
+        description: `${type.toUpperCase()} ${quickAmount} ${selectedCrypto.toUpperCase()} at market price`,
+      });
+    }, 500);
+  };
+
   const calculateTotal = () => {
     if (!amount) return 0;
     return parseFloat(amount) * (orderMode === 'market' ? currentPrice : parseFloat(price));
@@ -60,6 +73,24 @@ export const TradingInterface = ({ selectedCrypto }: TradingInterfaceProps) => {
           <div className="text-sm text-gray-400">Current Price</div>
           <div className="text-lg font-bold text-white">${currentPrice.toLocaleString()}</div>
         </div>
+      </div>
+
+      {/* Quick Trade Buttons */}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <button
+          onClick={() => handleQuickTrade('buy', '0.01')}
+          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center justify-center"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          Quick Buy 0.01 {selectedCrypto.toUpperCase()}
+        </button>
+        <button
+          onClick={() => handleQuickTrade('sell', '0.01')}
+          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white py-3 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center justify-center"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          Quick Sell 0.01 {selectedCrypto.toUpperCase()}
+        </button>
       </div>
 
       {/* Order Type Toggle */}
@@ -160,6 +191,10 @@ export const TradingInterface = ({ selectedCrypto }: TradingInterfaceProps) => {
             <span className="text-gray-400">Available:</span>
             <span className="text-sm text-gray-300">${balance.toLocaleString()}</span>
           </div>
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-gray-400">Fee (0.1%):</span>
+            <span className="text-sm text-gray-300">${(calculateTotal() * 0.001).toFixed(2)}</span>
+          </div>
         </div>
 
         {/* Trade Button */}
@@ -192,6 +227,25 @@ export const TradingInterface = ({ selectedCrypto }: TradingInterfaceProps) => {
             {percentage}
           </button>
         ))}
+      </div>
+
+      {/* Market Stats */}
+      <div className="mt-6 bg-slate-700/20 rounded-lg p-3">
+        <div className="text-xs text-gray-400 mb-2">Market Stats</div>
+        <div className="grid grid-cols-3 gap-3 text-xs">
+          <div className="text-center">
+            <div className="text-gray-500">24h High</div>
+            <div className="text-green-400 font-semibold">$44,250</div>
+          </div>
+          <div className="text-center">
+            <div className="text-gray-500">24h Low</div>
+            <div className="text-red-400 font-semibold">$42,100</div>
+          </div>
+          <div className="text-center">
+            <div className="text-gray-500">Volume</div>
+            <div className="text-white font-semibold">28.5B</div>
+          </div>
+        </div>
       </div>
     </div>
   );
